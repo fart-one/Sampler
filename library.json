@@ -1,0 +1,12 @@
+{
+  "name": "Sampler",
+  "keywords": "buffer, meidan, samples, measurements",
+  "description": "=Simple class for aggregate and improve quality of poor discreet sensors",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/fart-one/sampler.git"
+  },
+  "frameworks": "*",
+  "platforms": "*"
+}
