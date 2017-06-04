@@ -10,27 +10,38 @@ Sampler::Sampler(int bufferSize)
 {
   _bufferSize     = bufferSize;
   _bufferIterator = -1;
+  _bufferFilled   = false;
+
+  _buffer = new float[_bufferSize];
 }
 
-Sampler::Sampler(int bufferSize, int min, int max)
+Sampler::Sampler(int bufferSize, float min, float max)
 {
   _bufferSize     = bufferSize;
+  _bufferIterator = -1;
+  _bufferFilled   = false;
+
   _min            = min;
   _max            = max;
-  _bufferIterator = -1;
+
+  _buffer = new float[_bufferSize];
 }
 
-bool Sampler::addSample(int sample)
+Sampler::~Sampler()
+{
+  delete[] _buffer;
+}
+
+bool Sampler::addSample(float sample)
 {
 
   // check min range
-  if (_min > 0 && sample <= _min) {
+  if (_min > 0.0 && sample <= _min) {
     return false;
   }
 
-
   // check max range
-  if (_max > 0 && sample >= _max) {
+  if (_max > 0.0 && sample >= _max) {
     return false;
   }
 
@@ -40,12 +51,54 @@ bool Sampler::addSample(int sample)
   // add to buffer
   _buffer[_bufferIterator] = sample;
 
+  // check buffer filled flag
+  if (!_bufferFilled &&  _bufferIterator == (_bufferSize - 1)) {
+    _bufferFilled = true;
+  }
+
   return true;
 
 }
 
 float Sampler::getMeasurement()
 {
-  return 123.23;
+  float* sortedBuffer;
+  float calculatedValue;
+
+  // check buffer filled
+  if (!_bufferFilled) {
+    return 0.0;
+  }
+
+  sortedBuffer = new float[_bufferSize];
+
+  // copy values
+  for (int i = 0; i < _bufferSize; i++) {
+    sortedBuffer[i] = _buffer[i];
+  }
+
+  _sort(sortedBuffer, _bufferSize);
+
+
+  if (_bufferSize % 2 == 0)
+    calculatedValue = (sortedBuffer[_bufferSize / 2] + sortedBuffer[_bufferSize / 2 - 1]) / 2.0;
+  else
+    calculatedValue = sortedBuffer[_bufferSize / 2];
+
+  delete[] sortedBuffer;
+
+  return calculatedValue;
 }
 
+void Sampler::_sort(float array[], int size)
+{
+  for(int i=0; i<(size-1); i++) {
+    for(int o=0; o<(size-(i+1)); o++) {
+      if(array[o] > array[o+1]) {
+        float t = array[o];
+        array[o] = array[o+1];
+        array[o+1] = t;
+      }
+    }
+  }
+}

@@ -12,16 +12,20 @@ class Sampler
 {
   public:
     Sampler(int bufferSize);
-    Sampler(int bufferSize, int min, int max);
-    bool addSample(int sample);
+    Sampler(int bufferSize, float min, float max);
+    ~Sampler();
+    bool addSample(float sample);
     float getMeasurement();
   private:
     int _bufferSize;
-    int _min;
-    int _max;
-
     int _bufferIterator;
-    int _buffer[];
+    float* _buffer;
+    bool _bufferFilled;
+
+    float _min;
+    float _max;
+
+    void _sort(float array[], int size);
 };
 
 #endif
