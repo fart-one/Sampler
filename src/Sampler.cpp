@@ -6,6 +6,15 @@
 #include "Arduino.h"
 #include "Sampler.h"
 
+Sampler::Sampler()
+{
+  _bufferSize     = 40;
+  _bufferIterator = -1;
+  _bufferFilled   = false;
+
+  _buffer = new float[_bufferSize];
+}
+
 Sampler::Sampler(int bufferSize)
 {
   _bufferSize     = bufferSize;
@@ -35,14 +44,18 @@ Sampler::~Sampler()
 bool Sampler::addSample(float sample)
 {
 
+  bool filtered = false;
+
   // check min range
   if (_min > 0.0 && sample <= _min) {
-    return false;
+    sample = _min;
+    filtered = true;
   }
 
   // check max range
   if (_max > 0.0 && sample >= _max) {
-    return false;
+    sample = _max;
+    filtered = true;
   }
 
   // calculate next buffer index
@@ -56,7 +69,7 @@ bool Sampler::addSample(float sample)
     _bufferFilled = true;
   }
 
-  return true;
+  return filtered;
 
 }
 
@@ -101,4 +114,44 @@ void Sampler::_sort(float array[], int size)
       }
     }
   }
+}
+
+Sampler &Sampler::setBufferSize(int bufferSize)
+{
+  delete[] _buffer;
+
+  _bufferSize     = bufferSize;
+  _bufferIterator = -1;
+  _bufferFilled   = false;
+
+  _buffer = new float[_bufferSize];
+
+  return *this;
+}
+
+Sampler &Sampler::setMin(float min)
+{
+  _min = min;
+  return *this;
+}
+
+Sampler &Sampler::setMax(float max)
+{
+  _max = max;
+  return *this;
+}
+
+int Sampler::getBufferSize()
+{
+  return _bufferSize;
+}
+
+float Sampler::getMin()
+{
+  return _min;
+}
+
+float Sampler::getMax()
+{
+  return _max;
 }

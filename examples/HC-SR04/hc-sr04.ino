@@ -3,15 +3,18 @@
 #define trigPin 5
 #define echoPin 4
 
-Sampler sampler(40, 4, 200);
+Sampler sampler;
 
 void setup() {
   Serial.begin(9600);
+  sampler
+    .setBufferSize(40)
+    .setMin(4.0)
+    .setMax(100.0);
 }
 
 void loop() {
   float measure = singleMeasure();
-  
   sampler.addSample(measure);
 
   // print raw measure
